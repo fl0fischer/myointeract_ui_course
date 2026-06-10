@@ -1,0 +1,15 @@
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+.eggs/
+logs/
+tracked_checkpoints/
+wandb/
+*.ipynb_checkpoints/
+.gradio/
+MUJOCO_LOG.TXT
+MJMODEL.TXT
+MJDATA.TXT
