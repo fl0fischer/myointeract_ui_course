@@ -34,6 +34,11 @@ myosuite = "myosuite.envs.myo.backends.mjlab"
 requires = ["setuptools>=65", "wheel"]
 build-backend = "setuptools.build_meta"
 
+[tool.setuptools]
+# Use git-tracked files to discover package data (ensures JSON configs are
+# bundled into the wheel when installing via pip install git+...)
+include-package-data = true
+
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["myosuite*", "tutorials*"]
