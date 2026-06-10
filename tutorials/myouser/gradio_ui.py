@@ -1,4 +1,5 @@
 import os
+from pathlib import Path as _Path
 
 import gradio as gr
 from mjlab.tasks.registry import load_env_cfg, load_rl_cfg
@@ -46,7 +47,7 @@ if gr.NO_RELOAD:
         _sys.path.insert(0, _this_dir)
     from viser_viewer_ext import CameraRestoringViserViewer, PollingViserViewer
 
-    myouser_path = Path(__file__).resolve().parent / "myouser"
+    myouser_path = Path(__file__).resolve().parent  # gradio_ui.py IS already inside myouser/
 
     _viser_preview_server = viser.ViserServer(port=7861)
     try:
@@ -1517,11 +1518,13 @@ def update_dwell_duration(dwell_duration, ctrl_dt):
     return gr.update(minimum=max(ctrl_dt, 0))
 
 
+_CONFIG_DIR = _Path(__file__).resolve().parent / "gradio_configs"
+
+
 class ConfigSaver:
     def check_folder(self):
-        if not os.path.exists("gradio_configs"):
-            os.makedirs("gradio_configs")
-        files = os.listdir("gradio_configs")
+        _CONFIG_DIR.mkdir(parents=True, exist_ok=True)
+        files = os.listdir(_CONFIG_DIR)
         json_files = [file for file in files if file.endswith(".json")]
         file_names = [file.split(".")[0] for file in json_files]
         return file_names
@@ -1574,7 +1577,7 @@ class ConfigSaver:
 
     def add_config(self, config_name, data):
         labelled_dict = self.to_labelled_dict(data)
-        with open(f"gradio_configs/{config_name}.json", "w") as f:
+        with open(_CONFIG_DIR / f"{config_name}.json", "w") as f:
             json.dump(labelled_dict, f, indent=4)
 
     def config_save_clicked(self, config_name_input, *args):
@@ -1590,7 +1593,7 @@ class ConfigSaver:
         return self.my_configs
 
     def load_config(self, config_name):
-        with open(f"gradio_configs/{config_name}.json", "r") as f:
+        with open(_CONFIG_DIR / f"{config_name}.json", "r") as f:
             # data = json.load(f)
             labelled_data = json.load(f)
         data = self.from_labelled_dict(labelled_data)

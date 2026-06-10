@@ -1,0 +1,409 @@
+<mujocoinclude model="MoBL Arms Index Model">
+
+    <body name="thorax" pos="0 0 0" quat="0.7071067811865475 0.7071067811865475 0.0 0.0">
+      <light mode="trackcom" directional="false" pos="0 0 4.0" dir="0 0 -1" />
+      <geom name="thorax" type="mesh" mesh="thorax" />
+      <site name="PECM1-P3" pos="  -7e-05  0.00821  0.10454" />
+      <site name="PECM2-P4" pos="0.0288435 -0.0365979 0.0905616" />
+      <site name="PECM2-P5" pos="0.0258388 -0.0419728 0.0211917" />
+      <site name="PECM2-P3" pos=" 0.02083 -0.02005  0.11555" />
+      <site name="PECM3-P4" pos="0.0489901 -0.0785427 0.0833764" />
+      <site name="PECM3-P5" pos="0.0534132 -0.108749 0.0353382" />
+      <site name="PECM3-P3" pos=" 0.02984 -0.0544459   0.1151" />
+      <site name="LAT1-P4" pos="-0.110372 -0.0944155 0.0309431" />
+      <site name="LAT1-P5" pos="-0.0893765 -0.109402 0.00823033" />
+      <site name="LAT2-P4" pos="-0.102571 -0.157776 0.0268559" />
+      <site name="LAT2-P5" pos="-0.0670557 -0.175599 0.00760512" />
+      <site name="LAT3-P4" pos="-0.104111 -0.180909 0.0516215" />
+      <site name="LAT3-P5" pos="-0.0664119 -0.231961 0.00846362" />
+      <joint name="r_z" type="hinge" pos="0 0 0" axis="       0        0        1" limited="true" range="-6.28319  6.28319" ref="0" armature="0" damping="0" stiffness="0" />
+      <body name="clavicle" pos="0.00590214 0.00646669 0.0237625" quat="1.0 0.0 0.0 0.0">
+        <geom name="clavicle" type="mesh" mesh="clavicle" />
+        <inertial pos="-0.0103542 0.00594627 0.0505465" mass="0.145570469808028" fullinertia="0.000197115 0.00020741 3.60931e-05 -1.54221e-05 -5.68292e-05 4.36417e-05" />
+        <site name="DELT1-P4" pos="-0.013064 0.0103206 0.0748475" />
+        <site name="DELT2-P2" pos="0.0191703 0.0244002 0.162891" />
+        <site name="PECM1-P4" pos="0.00299539 -0.000121309 0.0477117" />
+        <joint name="sternoclavicular_r2" type="hinge" pos="0 0 0" axis="  0.0153 0.989299  -0.1451" limited="false" range="-99999.9  99999.9" ref="0" />
+        <joint name="sternoclavicular_r3" type="hinge" pos="0 0 0" axis="-0.994473        0 -0.104997" limited="false" range="-99999.9  99999.9" ref="0" />
+        <body name="clavphant" pos="-0.013372 0.0187282 0.126474" quat="1.0 0.0 0.0 0.0">
+          <inertial pos="       0        0        0" mass="9.33144037230948e-05" fullinertia="0.812542 0.812542 0.812542        0        0        0" />
+          <joint name="unrotscap_r3" type="hinge" pos="0 0 0" axis="-0.994473        0 -0.104997" limited="false" range="-99999.9  99999.9" ref="0" />
+          <joint name="unrotscap_r2" type="hinge" pos="0 0 0" axis="  0.0153 0.989299  -0.1451" limited="false" range="-99999.9  99999.9" ref="0" />
+          <body name="scapula" pos="       0        0        0" quat="1.0 0.0 0.0 0.0">
+            <geom name="scapula" type="mesh" mesh="scapula" />
+            <inertial pos="-0.0510374 -0.0326899 -0.0408101" mass="0.656896076449098" fullinertia="0.00100991 0.000934749 0.0011092 0.000365157 0.000332509 0.000195904" />
+            <site name="DELT1-P3" pos="0.0405638 -0.0303458 0.000923813" />
+            <site name="DELT2-P3" pos="4.66572e-005 0.00274344 0.0208371" />
+            <site name="DELT2-P4" pos="-0.0100593 -0.000317269 0.00578549" />
+            <site name="DELT3-P1" pos="-0.0520041 0.00113844 -0.0234406" />
+            <site name="DELT3-P2" pos="-0.0676249 -0.0306538 0.0115057" />
+            <site name="SUPSP-P2" pos="-0.0178977 0.00118509 -0.0118603" />
+            <site name="SUPSP-P3" pos="-0.0410583 -0.0141091 -0.0546356" />
+            <site name="INFSP-P2" pos="-0.0688847 -0.051099 -0.0446136" />
+            <site name="SUBSC-P2" pos="-0.0170859 -0.0487381 -0.0229273" />
+            <site name="SUBSC-P3" pos="-0.0676156 -0.0367939 -0.0604211" />
+            <site name="TMIN-P2" pos="-0.0883967 -0.0745675 -0.044203" />
+            <site name="TMIN-P3" pos="-0.0899831 -0.0757806 -0.049438" />
+            <site name="TMAJ-P2" pos="-0.0957779 -0.0962911 -0.054393" />
+            <site name="TMAJ-P3" pos="-0.0978775 -0.101666 -0.0664119" />
+            <site name="LAT1-P2" pos="-0.08052 -0.06821 -0.02908" />
+            <site name="LAT1-P3" pos="-0.10925 -0.07239 -0.07422" />
+            <site name="LAT2-P2" pos="-0.08345 -0.08695 -0.02453" />
+            <site name="LAT2-P3" pos="-0.11524 -0.10749 -0.08863" />
+            <site name="LAT3-P2" pos="-0.08438 -0.11598 -0.02995" />
+            <site name="LAT3-P3" pos="-0.11279 -0.13833 -0.08911" />
+            <site name="CORB-P1" pos="0.0116643 -0.0385109 -0.024747" />
+            <site name="CORB-P2" pos="0.00450709 -0.0649282 -0.014585" />
+            <site name="TRIlong-P1" pos="-0.042598 -0.038007 -0.0128494" />
+            <site name="BIClong-P1" pos="-0.0291421 -0.0219569 -0.0121775" />
+            <site name="BIClong-P2" pos="-0.01954 -0.0122149 -0.00430179" />
+            <site name="BICshort-P1" pos="0.0118323 -0.0366819 -0.024495" />
+            <site name="BICshort-P2" pos="0.000867824 -0.062558 -0.014865" />
+            <joint name="acromioclavicular_r2" type="hinge" pos="0 0 0" axis="0.157095 0.947269 -0.279291" limited="false" range="-99999.9  99999.9" ref="0" />
+            <joint name="acromioclavicular_r3" type="hinge" pos="0 0 0" axis="-0.754084 0.297594 0.585487" limited="false" range="-99999.9  99999.9" ref="0" />
+            <joint name="acromioclavicular_r1" type="hinge" pos="0 0 0" axis="  0.6377   0.1186   0.7611" limited="false" range="-99999.9  99999.9" ref="0" />
+            <body name="scapphant" pos="-0.00891153 -0.0317269 0.0083983" quat="1.0 0.0 0.0 0.0">
+              <inertial pos="       0        0        0" mass="9.33144037230948e-05" fullinertia="0.812542 0.812542 0.812542        0        0        0" />
+              <joint name="unrothum_r1" type="hinge" pos="0 0 0" axis="  0.6377   0.1186   0.7611" limited="false" range="-99999.9  99999.9" ref="0" />
+              <joint name="unrothum_r3" type="hinge" pos="0 0 0" axis="-0.754084 0.297594 0.585487" limited="false" range="-99999.9  99999.9" ref="0" />
+              <joint name="unrothum_r2" type="hinge" pos="0 0 0" axis="0.157095 0.947269 -0.279291" limited="false" range="-99999.9  99999.9" ref="0" />
+              <body name="humphant" pos="       0        0        0" quat="1.0 0.0 0.0 0.0">
+                <inertial pos="       0        0        0" mass="9.33144037230948e-05" fullinertia="0.812542 0.812542 0.812542        0        0        0" />
+                <joint name="elv_angle" type="hinge" pos="0 0 0" axis="  0.0048 0.999089   0.0424" limited="true" range=" -1.5708  2.26893" ref="0" user="1" />
+                <body name="humphant1" pos="       0        0        0" quat="1.0 0.0 0.0 0.0">
+                  <inertial pos="       0        0        0" mass="9.33144037230948e-05" fullinertia="0.812542 0.812542 0.812542        0        0        0" />
+                  <joint name="shoulder_elv" type="hinge" pos="0 0 0" axis="-0.998261   0.0023 0.058898" limited="true" range="       0  3.14159" ref="0" user="1" />
+                  <joint name="shoulder1_r2" type="hinge" pos="0 0 0" axis="  0.0048 0.999089   0.0424" limited="false" range="-99999.9  99999.9" ref="0" />
+                  <body name="humerus" pos="       0        0        0" quat="1.0 0.0 0.0 0.0">
+                    <geom name="humerus" type="mesh" mesh="humerus" />
+                    <inertial pos="0.0168563 -0.130772 -0.0118939" mass="1.86402053445143" fullinertia="0.0099761 0.00207306 0.0102209 -0.000282285 -0.000188916 0.000998858" />
+                    <site name="DELT1-P1" pos="0.00836097 -0.110886 0.00545889" />
+                    <site name="DELT1-P2" pos="0.0151449 -0.102954 0.00384455" />
+                    <site name="DELT2-P1" pos="0.00430179 -0.12701 0.00522561" />
+                    <site name="DELT3-P3" pos="0.00192228 -0.0709376 0.00975136" />
+                    <site name="SUPSP-P1" pos="0.00238885 0.00991932 0.0241964" />
+                    <site name="INFSP-P1" pos="-0.00827699 0.00451642 0.0228434" />
+                    <site name="SUBSC-P1" pos="0.013092 0.00783841 -0.0124201" />
+                    <site name="TMIN-P1" pos="-0.00102646 -0.0117949 0.0201186" />
+                    <site name="TMAJ-P1" pos="0.00931278 -0.0505671 -0.00530026" />
+                    <site name="PECM1-P1" pos="0.0109085 -0.0391081 0.00727852" />
+                    <site name="PECM1-P2" pos="  0.0191  -0.0301  0.00143" />
+                    <site name="PECM2-P1" pos="0.0118883 -0.0400225 0.00732518" />
+                    <site name="PECM2-P2" pos=" 0.01748 -0.03533  0.00033" />
+                    <site name="PECM3-P1" pos="0.0118416 -0.0408251 0.00699858" />
+                    <site name="PECM3-P2" pos="0.0159185 -0.045833 -0.00378312" />
+                    <site name="LAT1-P1" pos="0.00979801 -0.0318669 -0.00609343" />
+                    <site name="LAT2-P1" pos="0.00903283 -0.0379883 -0.00570151" />
+                    <site name="LAT3-P1" pos="0.0112724 -0.0365979 -0.00388188" />
+                    <site name="CORB-P3" pos="0.00693326 -0.14042 -0.00729719" />
+                    <site name="TRIlong-P2" pos="-0.0253255 -0.106761 -0.00619608" />
+                    <site name="TRIlong-P3" pos="-0.0297113 -0.211236 -0.0113564" />
+                    <site name="TRIlong-P4" pos="-0.0162647 -0.249681 -0.0112724" />
+                    <site name="TRIlat-P1" pos="-0.00558953 -0.118005 0.00399386" />
+                    <site name="TRIlat-P2" pos="-0.0218729 -0.135567 0.00865958" />
+                    <site name="TRIlat-P3" pos="-0.0297113 -0.211236 -0.0113564" />
+                    <site name="TRIlat-P4" pos="-0.0162647 -0.249681 -0.0112724" />
+                    <site name="TRImed-P1" pos="-0.00781975 -0.127794 -0.00845428" />
+                    <site name="TRImed-P2" pos="-0.0242711 -0.141269 -0.010078" />
+                    <site name="TRImed-P3" pos="-0.0297113 -0.211236 -0.0113564" />
+                    <site name="TRImed-P4" pos="-0.0162647 -0.249681 -0.0112724" />
+                    <site name="ANC-P1" pos="-0.00694259 -0.26463 0.00913548" />
+                    <site name="BIClong-P3" pos="0.0198853 0.0167313 0.00959272" />
+                    <site name="BIClong-P4" pos="0.0221902 -0.00476837 0.0112071" />
+                    <site name="BIClong-P5" pos="0.0125508 -0.02638 0.00126908" />
+                    <site name="BIClong-P6" pos="0.00996598 -0.072188 -0.00153969" />
+                    <site name="BIClong-P7" pos="0.0158914 -0.113144 0.000223955" />
+                    <site name="BIClong-P8" pos="0.0212757 -0.163673 -0.00587881" />
+                    <site name="BICshort-P3" pos="0.0104232 -0.070695 -0.0102739" />
+                    <site name="BICshort-P4" pos="0.0158914 -0.113144 -0.0100686" />
+                    <site name="BICshort-P5" pos="0.0212757 -0.163673 -0.00587881" />
+                    <site name="BRA-P1" pos="0.00634538 -0.162274 -0.00335932" />
+                    <site name="BRA-P2" pos="0.0176737 -0.266497 -0.0103112" />
+                    <site name="BRD-P1" pos="-0.00914481 -0.186284 0.00208091" />
+                    <site name="ECRL-P1" pos="-0.00681195 -0.243457 0.00849161" />
+                    <site name="ECRB-P1" pos="0.0125881 -0.27106 0.0158448" />
+                    <site name="ECU-P1" pos="0.00077451 -0.270192 0.0175431" />
+                    <site name="FCR-P1" pos="0.00707323 -0.25947 -0.034573" />
+                    <site name="FCU-P1" pos="0.00204359 -0.258854 -0.036206" />
+                    <site name="PL-P1" pos="0.00426447 -0.256792 -0.036066" />
+                    <site name="PT-P1" pos="0.00335932 -0.257454 -0.0340598" />
+                    <site name="FDSL-P1" pos="0.00392854 -0.257529 -0.0360567" />
+                    <site name="FDSR-P1" pos="0.00446976 -0.260161 -0.0348156" />
+                    <site name="EDCL-P1" pos="-0.000373258 -0.269035 0.0174498" />
+                    <site name="EDCR-P1" pos="-0.0014557 -0.270015 0.0166286" />
+                    <site name="EDCM-P1" pos="0.000475903 -0.270462 0.018187" />
+                    <site name="EDCI-P1" pos="0.000606544 -0.26966 0.0174405" />
+                    <site name="EDM-P1" pos="0.000830498 -0.269856 0.0172352" />
+                    <joint name="shoulder_rot" type="hinge" pos="0 0 0" axis="  0.0048 0.999089   0.0424" limited="true" range=" -1.5708 0.349066" ref="0" user="1" />
+                    <body name="ulna" pos="0.00569218 -0.270985 -0.0114777" quat="1.0 0.0 0.0 0.0">
+                      <geom name="ulna" type="mesh" mesh="ulna" />
+                      <inertial pos="0.00906814 -0.089536 0.0226623" mass="1.03140410435137" fullinertia="0.00439837 0.000937008 0.00401689 0.000257462 -6.18751e-05 0.000887044" />
+                      <site name="TRIlong-P5" pos="-0.0204359 0.00976069 -0.000727852" />
+                      <site name="TRIlat-P5" pos="-0.0204359 0.00976069 -0.000727852" />
+                      <site name="TRImed-P5" pos="-0.0204359 0.00976069 -0.000727852" />
+                      <site name="ANC-P2" pos="-0.0236272 -0.0011571 0.00559886" />
+                      <site name="SUP-P3" pos="-0.0126908 -0.0315776 0.0187842" />
+                      <site name="BRA-P4" pos="-0.00298606 -0.0223021 0.00083983" />
+                      <site name="BRA-P3" pos="0.00464706 -0.0136519 0.00119442" />
+                      <site name="ECU-P2" pos="-0.01298 -0.0298699 0.0274998" />
+                      <site name="ECU-P3" pos="-0.0159101 -0.0506511 0.0267626" />
+                      <site name="ECU-P4" pos="-0.0167313 -0.0893299 0.0305885" />
+                      <site name="PT-P2" pos="0.0078944 -0.0314749 -0.0133626" />
+                      <site name="PT-P3" pos=" 0.01219 -0.06516 -0.00219" />
+                      <site name="PQ-P2" pos="0.00180097 -0.195699 0.0338918" />
+                      <site name="FDSM-P1" pos="-0.00624273 -0.0253162 -0.00178231" />
+                      <site name="FDSI-P1" pos="-0.00630805 -0.0263053 -0.00127841" />
+                      <site name="FDPL-P1" pos="-0.00586014 -0.0299912 0.00237019" />
+                      <site name="FDPR-P1" pos="-0.00468438 -0.0314843 0.00254748" />
+                      <site name="FDPM-P1" pos="-0.00487101 -0.0310457 0.0019596" />
+                      <site name="FDPI-P1" pos="-0.00603744 -0.0296367 0.0026128" />
+                      <site name="EDM-P2" pos="-0.00911682 -0.0364579 0.0287875" />
+                      <site name="EDM-P3" pos="-0.00704524 -0.077143 0.0340224" />
+                      <site name="EIP-P1" pos="-0.00367659 -0.155387 0.0343584" />
+                      <site name="EIP-P2" pos="0.00159568 -0.163011 0.037783" />
+                      <site name="EPL-P1" pos="-0.013176 -0.090571 0.0275464" />
+                      <joint name="elbow_flexion" type="hinge" pos="0 0 0" axis="  0.0494   0.0366 0.998108" limited="true" range="       0  4.26893" ref="0" user="1" />
+                      <body name="radius" pos="0.000373258 -0.010734 0.0186619" quat="1.0 0.0 0.0 0.0">
+                        <geom name="radius" type="mesh" mesh="radius" />
+                        <inertial pos="0.0313855 -0.169421 0.014557" mass="0.217973115656777" fullinertia="0.00035634 7.19831e-05 0.000327113 2.449e-05 -3.44518e-06 5.2149e-05" />
+                        <site name="SUP-P1" pos="0.00929411 -0.0568845 0.000699858" />
+                        <site name="SUP-P2" pos="0.0112071 -0.0482435 -0.000998464" />
+                        <site name="BIClong-P11" pos="-0.00186629 -0.0349929 -0.00186629" />
+                        <site name="BIClong-P9" pos=" 0.00273 -0.0343493 -0.0119845" />
+                        <site name="BICshort-P8" pos="-0.00186629 -0.0349929 -0.00186629" />
+                        <site name="BICshort-P6" pos=" 0.00273 -0.0343493 -0.0119845" />
+                        <site name="BRD-P2" pos="0.0333786 -0.118901 0.0216023" />
+                        <site name="BRD-P3" pos="0.0390987 -0.206225 0.0209024" />
+                        <site name="ECRL-P2" pos="0.029814 -0.125629 0.0259321" />
+                        <site name="ECRL-P3" pos="0.0395933 -0.221006 0.0337798" />
+                        <site name="ECRB-P2" pos="0.0271078 -0.122111 0.0222555" />
+                        <site name="ECRB-P3" pos="0.0331173 -0.212803 0.0367379" />
+                        <site name="ECU-P5" pos="-0.01326 -0.211786 0.0324827" />
+                        <site name="FCR-P2" pos="0.0196893 -0.20476 0.00118509" />
+                        <site name="FCU-P3" pos="0.0100966 -0.208343 0.00904217" />
+                        <site name="FCU-P2" pos="0.0101156 -0.183524 0.00202653" />
+                        <site name="PL-P2" pos="0.0236179 -0.223161 -0.00257548" />
+                        <site name="PT-P5" pos="0.0237019 -0.101526 0.0184763" />
+                        <site name="PT-P4" pos="0.0220222 -0.0871557 0.00877155" />
+                        <site name="PQ-P1" pos="0.0302805 -0.18661 0.0183083" />
+                        <site name="FDSL-P2" pos="0.0128494 -0.174666 0.00191295" />
+                        <site name="FDSR-P2" pos="0.0146597 -0.174181 0.00249149" />
+                        <site name="FDSM-P2" pos="0.0177204 -0.174554 0.00395653" />
+                        <site name="FDSI-P2" pos="0.0200159 -0.173779 0.00515096" />
+                        <site name="FDPL-P2" pos="0.013148 -0.172781 0.00803437" />
+                        <site name="FDPR-P2" pos="0.0147437 -0.173835 0.00749315" />
+                        <site name="FDPM-P2" pos="0.0177857 -0.173975 0.00732518" />
+                        <site name="FDPI-P2" pos="0.0194094 -0.173192 0.00853827" />
+                        <site name="EDCL-P3" pos="0.00926612 -0.208128 0.0337612" />
+                        <site name="EDCL-P2" pos="  0.0013 -0.0382544 0.0129514" />
+                        <site name="EDCR-P3" pos="0.00823033 -0.208707 0.0399759" />
+                        <site name="EDCR-P2" pos="  0.0026 -0.0392844 0.0144214" />
+                        <site name="EDCM-P3" pos="0.0134373 -0.208306 0.0394067" />
+                        <site name="EDCM-P2" pos=" 0.00316 -0.0388544 0.0141814" />
+                        <site name="EDCI-P3" pos="0.0143051 -0.208222 0.0391547" />
+                        <site name="EDCI-P2" pos=" 0.00228 -0.0385544 0.0137314" />
+                        <site name="EDM-P4" pos="0.00423647 -0.211273 0.034321" />
+                        <site name="EIP-P3" pos="0.0100406 -0.212598 0.0341904" />
+                        <site name="EPL-P2" pos="0.0011571 -0.127542 0.0211824" />
+                        <site name="EPL-P3" pos="0.0252136 -0.204097 0.0357208" />
+                        <site name="EPL-P4" pos="0.0315589 -0.212328 0.0429899" />
+                        <site name="EPL-P5" pos="0.0395093 -0.221818 0.0389401" />
+                        <site name="EPB-P1" pos="0.0179537 -0.137126 0.0197267" />
+                        <site name="EPB-P2" pos="0.0212384 -0.147969 0.0248683" />
+                        <site name="EPB-P3" pos="0.0357487 -0.184035 0.0357767" />
+                        <site name="EPB-P4" pos="0.0488501 -0.220325 0.0251856" />
+                        <site name="FPL-P1" pos="0.00906083 -0.0882568 0.0165073" />
+                        <site name="FPL-P2" pos="0.0154715 -0.126208 0.0178697" />
+                        <site name="FPL-P3" pos="0.0174405 -0.167331 0.0185509" />
+                        <site name="FPL-P4" pos="0.0354595 -0.216219 0.0147437" />
+                        <site name="APL-P1" pos="0.0107685 -0.0884341 0.0156862" />
+                        <site name="APL-P2" pos="0.0282743 -0.13036 0.0327254" />
+                        <site name="APL-P3" pos="0.0372604 -0.149975 0.0317269" />
+                        <site name="APL-P4" pos="0.0410303 -0.16652 0.0292447" />
+                        <site name="APL-P5" pos="0.0513696 -0.215407 0.0220969" />
+                        <joint name="pro_sup" type="hinge" pos="0 0 0" axis="-0.017161 0.992666 -0.119668" limited="true" range=" -1.5708   1.5708" ref="0" user="1" />
+                        <body name="proximal_row" pos="0.0167966 -0.225821 0.0233286" quat="1.0 0.0 0.0 0.0">
+                          <geom name="lunate" type="mesh" mesh="lunate" />
+                          <geom name="sdfastSCAPHOIDw" type="mesh" mesh="sdfastSCAPHOIDw" />
+                          <geom name="sdfastPISIFORMw" type="mesh" mesh="sdfastPISIFORMw" />
+                          <geom name="sdfastTRIQUETRALw" type="mesh" mesh="sdfastTRIQUETRALw" />
+                          <inertial pos="       0        0        0" mass="9.33144037230948e-05" fullinertia="8.12542e-06 8.12542e-06 8.12542e-06        0        0        0" />
+                          <body name="hand" pos="0.00372511 -0.0140476 0.00217143" quat="1.0 0.0 0.0 0.0">
+                            <geom name="sdfast_1seg_hand_fr_c_5mc" type="mesh" mesh="sdfast_1seg_hand_fr_c_5mc" />
+                            <geom name="sdfast_1seg_hand_fr_c_4mc" type="mesh" mesh="sdfast_1seg_hand_fr_c_4mc" />
+                            <geom name="sdfast_1seg_hand_fr_c_3mc" type="mesh" mesh="sdfast_1seg_hand_fr_c_3mc" />
+                            <geom name="sdfast_1seg_hand_fr_c_trapezium" type="mesh" mesh="sdfast_1seg_hand_fr_c_trapezium" />
+                            <geom name="sdfast_1seg_hand_fr_c_trapezoid" type="mesh" mesh="sdfast_1seg_hand_fr_c_trapezoid" />
+                            <geom name="sdfast_1seg_hand_fr_c_hamate" type="mesh" mesh="sdfast_1seg_hand_fr_c_hamate" />
+                            <geom name="capitate" type="mesh" mesh="capitate" />
+                            <geom name="hand_3proxph" type="mesh" mesh="hand_3proxph" />
+                            <geom name="hand_3midph" type="mesh" mesh="hand_3midph" />
+                            <geom name="hand_3distph" type="mesh" mesh="hand_3distph" />
+                            <geom name="hand_4proxph" type="mesh" mesh="hand_4proxph" />
+                            <geom name="hand_4midph" type="mesh" mesh="hand_4midph" />
+                            <geom name="hand_4distph" type="mesh" mesh="hand_4distph" />
+                            <geom name="hand_5proxph" type="mesh" mesh="hand_5proxph" />
+                            <geom name="hand_5midph" type="mesh" mesh="hand_5midph" />
+                            <geom name="hand_5distph" type="mesh" mesh="hand_5distph" />
+                            <geom name="hand_thumbprox" type="mesh" mesh="hand_thumbprox" />
+                            <geom name="hand_thumbdist" type="mesh" mesh="hand_thumbdist" />
+                            <geom name="hand_1mc" type="mesh" mesh="hand_1mc" />
+                            <inertial pos="-0.00281169 -0.039658 -0.00104703" mass="0.542996515264689" fullinertia="8.93797e-05 4.87525e-05 0.000121881 7.31288e-07 -1.62508e-07 9.75051e-06" />
+                            <site name="ECRL-P4" pos="0.0160221 -0.0198013 0.00544023" />
+                            <site name="ECRB-P4" pos="0.00466572 -0.0106005 0.00793172" />
+                            <site name="ECU-P6" pos="-0.0210051 -0.0130733 -0.00119442" />
+                            <site name="FCR-P3" pos="0.0104885 -0.0172072 -0.00390054" />
+                            <site name="FCU-P4" pos="-0.0189988 -0.01647 -0.00701724" />
+                            <site name="PL-P3" pos="0.00855693 -0.0177111 -0.0163673" />
+                            <site name="PL-P4" pos="0.00211824 -0.0288901 0.0046004" />
+                            <site name="FDSL-P3" pos="-0.00219289 -0.0129987 -0.0128401" />
+                            <site name="FDSL-P4" pos="-0.0186162 -0.0399479 -0.00692393" />
+                            <site name="FDSL-P5" pos="-0.0190735 -0.0558113 -0.0175244" />
+                            <site name="FDSL-P6" pos="-0.0159848 -0.0676063 -0.0256895" />
+                            <site name="FDSL-P7" pos="-0.0107871 -0.0678489 -0.0341157" />
+                            <site name="FDSL-P8" pos="-0.009882 -0.0678489 -0.0354221" />
+                            <site name="FDSR-P3" pos="-0.000765178 -0.0125415 -0.0126814" />
+                            <site name="FDSR-P4" pos="-0.00911682 -0.0483275 3.73258e-005" />
+                            <site name="FDSR-P5" pos="-0.0123455 -0.0622407 -0.00951807" />
+                            <site name="FDSR-P6" pos="-0.00735318 -0.0749035 -0.0233566" />
+                            <site name="FDSR-P7" pos="-0.0027901 -0.075818 -0.0316802" />
+                            <site name="FDSR-P8" pos="0.000578549 -0.07551 -0.036318" />
+                            <site name="FDSM-P3" pos="0.00634538 -0.0128494 -0.0130547" />
+                            <site name="FDSM-P4" pos="0.00439511 -0.0310924 -0.00123175" />
+                            <site name="FDSM-P5" pos="0.00505764 -0.052816 0.000559886" />
+                            <site name="FDSM-P6" pos="0.00517895 -0.0674103 -0.00315403" />
+                            <site name="FDSM-P7" pos="0.0108898 -0.08221 -0.0155835" />
+                            <site name="FDSM-P8" pos="0.0121402 -0.0827699 -0.0277797" />
+                            <site name="FDSM-P9" pos="0.0146317 -0.0800358 -0.0351329" />
+                            <site name="FDSI-P3" pos="0.00829565 -0.0127467 -0.0129427" />
+                            <site name="FDSI-P4" pos="0.00990066 -0.0353382 0.000223955" />
+                            <site name="FDSI-P5" pos="0.0166286 -0.047665 0.00390054" />
+                            <site name="FDSI-P6" pos="0.0172538 -0.0680915 -0.00349929" />
+                            <site name="FDSI-P7" pos="0.0249896 -0.0813142 -0.0168339" />
+                            <site name="FDSI-P8" pos="0.024887 -0.0815568 -0.0249896" />
+                            <site name="FDSI-P9" pos="0.0248216 -0.0805583 -0.0270892" />
+                            <site name="FDPL-P3" pos="-0.000821167 -0.00958339 -0.0110858" />
+                            <site name="FDPL-P4" pos="-0.0173098 -0.0433539 -0.00683995" />
+                            <site name="FDPL-P5" pos="-0.0168712 -0.0545049 -0.014557" />
+                            <site name="FDPL-P6" pos="-0.0133253 -0.0680169 -0.0250363" />
+                            <site name="FDPL-P7" pos="-0.00858493 -0.0698272 -0.034377" />
+                            <site name="FDPL-P8" pos="-0.00291141 -0.0690993 -0.0388654" />
+                            <site name="FDPL-P9" pos="0.00416182 -0.0658706 -0.0434565" />
+                            <site name="FDPR-P3" pos="0.000989133 -0.0109831 -0.0110484" />
+                            <site name="FDPR-P4" pos="-0.00797838 -0.0517148 0.000821167" />
+                            <site name="FDPR-P5" pos="-0.0100686 -0.0614755 -0.00762379" />
+                            <site name="FDPR-P6" pos="-0.0051043 -0.0760886 -0.0210517" />
+                            <site name="FDPR-P7" pos="-0.000522561 -0.0767978 -0.031419" />
+                            <site name="FDPR-P8" pos="0.00568285 -0.0731305 -0.0395466" />
+                            <site name="FDPR-P9" pos="0.0113004 -0.068866 -0.0453321" />
+                            <site name="FDPM-P3" pos="0.00312603 -0.0119442 -0.0106752" />
+                            <site name="FDPM-P4" pos="0.00281809 -0.0321655 -0.00570151" />
+                            <site name="FDPM-P5" pos="0.00235152 -0.0547102 0.00113844" />
+                            <site name="FDPM-P6" pos="0.00265946 -0.0651801 -0.00124108" />
+                            <site name="FDPM-P7" pos="0.00805303 -0.0819207 -0.0169366" />
+                            <site name="FDPM-P8" pos="0.0093501 -0.0817994 -0.0276584" />
+                            <site name="FDPM-P9" pos="0.0152382 -0.0761166 -0.0413849" />
+                            <site name="FDPM-P10" pos="0.0178137 -0.0715068 -0.0487941" />
+                            <site name="FDPI-P3" pos="0.00836097 -0.0108991 -0.0113097" />
+                            <site name="FDPI-P4" pos="0.017935 -0.0517148 0.00408717" />
+                            <site name="FDPI-P5" pos="0.0193441 -0.065516 -0.00266879" />
+                            <site name="FDPI-P6" pos="0.0270985 -0.0801384 -0.0166286" />
+                            <site name="FDPI-P7" pos="0.0272851 -0.0809223 -0.0258388" />
+                            <site name="FDPI-P8" pos="0.0271918 -0.0768444 -0.0371298" />
+                            <site name="FDPI-P9" pos="0.0265666 -0.0725146 -0.0444736" />
+                            <site name="EDCL-P4" pos="-0.0229927 -0.041077 0.00157701" />
+                            <site name="EDCL-P5" pos="-0.0222182 -0.044175 0.000718521" />
+                            <site name="EDCL-P6" pos="-0.0223488 -0.0617088 -0.00934077" />
+                            <site name="EDCL-P7" pos="-0.0167779 -0.0732238 -0.0252975" />
+                            <site name="EDCL-P8" pos="-0.0109924 -0.0735038 -0.0352635" />
+                            <site name="EDCL-P9" pos="-0.00139972 -0.0707883 -0.042794" />
+                            <site name="EDCL-P10" pos="0.00187562 -0.0698645 -0.0447349" />
+                            <site name="EDCR-P4" pos="-0.0145944 -0.0517895 0.00871557" />
+                            <site name="EDCR-P5" pos="-0.013316 -0.0542997 0.0108338" />
+                            <site name="EDCR-P6" pos="-0.0147437 -0.0673357 -0.00392854" />
+                            <site name="EDCR-P7" pos="-0.00769844 -0.0815101 -0.0210891" />
+                            <site name="EDCR-P8" pos="-0.00253815 -0.0821727 -0.0318109" />
+                            <site name="EDCR-P9" pos="0.00711989 -0.0748941 -0.0434658" />
+                            <site name="EDCR-P10" pos="0.00997531 -0.0728692 -0.0461066" />
+                            <site name="EDCM-P4" pos="0.000363926 -0.049214 0.0139132" />
+                            <site name="EDCM-P5" pos="-0.000811835 -0.0520134 0.0135493" />
+                            <site name="EDCM-P6" pos="0.00173565 -0.0720201 0.00557087" />
+                            <site name="EDCM-P7" pos="0.00939676 -0.0869037 -0.016554" />
+                            <site name="EDCM-P8" pos="0.0123268 -0.0891899 -0.0285169" />
+                            <site name="EDCM-P9" pos="0.0173285 -0.0795505 -0.0444083" />
+                            <site name="EDCM-P10" pos="0.0191854 -0.0745862 -0.0498392" />
+                            <site name="EDCM-P11" pos="0.0204825 -0.0718614 -0.0528439" />
+                            <site name="EDCI-P4" pos="0.0143984 -0.0436711 0.0152942" />
+                            <site name="EDCI-P5" pos="0.0177017 -0.05276 0.0134186" />
+                            <site name="EDCI-P6" pos="0.0186069 -0.0716468 0.00554288" />
+                            <site name="EDCI-P7" pos="0.0274811 -0.0854947 -0.0116176" />
+                            <site name="EDCI-P8" pos="0.0291234 -0.0872396 -0.0271078" />
+                            <site name="EDCI-P9" pos="0.0281156 -0.0791959 -0.0398266" />
+                            <site name="EDCI-P10" pos="0.0273318 -0.0756127 -0.0463399" />
+                            <site name="EDM-P5" pos="-0.0192134 -0.00963005 0.0034713" />
+                            <site name="EDM-P6" pos="-0.0239165 -0.0440631 0.000214623" />
+                            <site name="EDM-P7" pos="-0.0237858 -0.060757 -0.0102459" />
+                            <site name="EDM-P8" pos="-0.0180377 -0.0728785 -0.0253629" />
+                            <site name="EDM-P9" pos="-0.0125601 -0.0736437 -0.0363366" />
+                            <site name="EDM-P10" pos="-0.00201559 -0.0701818 -0.042822" />
+                            <site name="EDM-P11" pos="0.00123175 -0.0685394 -0.0448189" />
+                            <site name="EIP-P4" pos="0.0036206 -0.0208464 0.0110484" />
+                            <site name="EIP-P5" pos="0.0157981 -0.0526293 0.0128494" />
+                            <site name="EIP-P6" pos="0.01619 -0.0717774 0.00542157" />
+                            <site name="EIP-P7" pos="0.0258014 -0.086913 -0.0140998" />
+                            <site name="EIP-P8" pos="0.0268652 -0.0880608 -0.0263427" />
+                            <site name="EIP-P9" pos="0.0267812 -0.0795412 -0.0400785" />
+                            <site name="EIP-P10" pos="0.0264453 -0.0726453 -0.0513323" />
+                            <site name="EPL-P6" pos="0.0226567 0.00013064 0.00567352" />
+                            <site name="EPL-P7" pos="0.0218169 -0.00855693 -0.000363926" />
+                            <site name="EPL-P8" pos="0.0271078 -0.013316 -0.00456307" />
+                            <site name="EPL-P9" pos="0.041189 -0.0318855 -0.0169272" />
+                            <site name="EPL-P10" pos="0.0454161 -0.0433539 -0.0232073" />
+                            <site name="EPL-P11" pos="0.0443337 -0.0654134 -0.0352169" />
+                            <site name="EPL-P12" pos="0.0374284 -0.0705923 -0.0399666" />
+                            <site name="EPB-P5" pos="0.0291421 0.00238885 -0.00305138" />
+                            <site name="EPB-P6" pos="0.027733 -0.00740916 -0.0133999" />
+                            <site name="EPB-P7" pos="0.0412636 -0.0307938 -0.0226007" />
+                            <site name="EPB-P8" pos="0.0422528 -0.0446509 -0.02973" />
+                            <site name="FPL-P6" pos="0.0116083 -0.0205945 -0.0194934" />
+                            <site name="FPL-P7" pos="0.0153129 -0.0244577 -0.0207251" />
+                            <site name="FPL-P8" pos="0.0229273 -0.0307378 -0.0208744" />
+                            <site name="FPL-P9" pos="0.02638 -0.051155 -0.0285076" />
+                            <site name="FPL-P10" pos="0.0327627 -0.0608317 -0.0349836" />
+                            <site name="FPL-P11" pos="0.032968 -0.0714415 -0.0384269" />
+                            <site name="FPL-P5" pos="0.0178892 0.0064176 -0.0168214" />
+                            <site name="APL-P7" pos="0.0241404 0.00191295 -0.0153969" />
+                            <site name="APL-P8" pos="0.0268559 -0.00628939 -0.0174498" />
+                            <site name="APL-P9" pos="0.0287035 -0.0147717 -0.0175898" />
+                            <site name="APL-P6" pos="0.0332244 0.00608975 -0.00870125" />
+                            <body name="index0" pos="0 0 0">
+                              <inertial pos="0 0 0" mass="0.001" diaginertia="0.001 0.001 0.001" />
+                              <geom name="sdfast_1seg_hand_fr_c_2mc" type="mesh" mesh="sdfast_1seg_hand_fr_c_2mc" />
+                              <body name="index1" pos="0 0 0">
+                                <inertial pos="0 0 0" mass="0.001" diaginertia="0.001 0.001 0.001" />
+                                <geom name="hand_2proxph" type="mesh" mesh="hand_2proxph" />
+                                <body name="index2" pos="0 0 0">
+                                  <inertial pos="0 0 0" mass="0.001" diaginertia="0.001 0.001 0.001" />
+                                  <geom name="hand_2midph" type="mesh" mesh="hand_2midph" />
+                                  <body name="index3" pos="0 0 0">
+                                    <inertial pos="0 0 0" mass="0.001" diaginertia="0.001 0.001 0.001" />
+                                    <geom name="hand_2distph" type="mesh" mesh="hand_2distph" />
+                                    <site name="fingertip" pos="0.024 -0.149 -0.0065" type="sphere" rgba="0.1 0.8 0.1 0.0" size="0.004" />
+                                  </body>
+                                </body>
+                              </body>
+                            </body>
+                          </body>
+                        </body>
+                      </body>
+                    </body>
+                  </body>
+                </body>
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+    </body>
+
+</mujocoinclude>

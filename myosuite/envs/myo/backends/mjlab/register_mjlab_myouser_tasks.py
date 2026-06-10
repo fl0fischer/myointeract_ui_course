@@ -203,10 +203,16 @@ def _compute_target_origin(config) -> np.ndarray:
 
 
 def _get_myosuite_root() -> Path:
-    """Resolve the installed ``myosuite`` package root lazily."""
-    from etils import epath
+    """Resolve the installed ``myosuite`` package root.
 
-    return Path(epath.resource_path("myosuite")).parent
+    Uses __file__ so it works even when multiple packages provide a myosuite
+    namespace (e.g. during local dev alongside myosuite4), avoiding the
+    MultiplexedPath error that etils.epath.resource_path() would raise.
+
+    This file lives at myosuite/envs/myo/backends/mjlab/, which is 5 levels
+    deep → parents[4] is the myosuite package dir, parents[5] is the repo root.
+    """
+    return Path(__file__).resolve().parents[5]
 
 def _universal_spec_fn(xml_file: Path, config: BaseEnvConfig) -> mujoco.MjSpec:
     seed = getattr(config.run, "seed", None)
