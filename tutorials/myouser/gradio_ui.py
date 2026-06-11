@@ -2107,12 +2107,16 @@ def get_ui(project_name, run_state=RunState(), use_legacy_rendering=False):
             # Reset both 3D scene geometry and GUI control panel so no old
             # elements bleed into the new viewer instance.
             _viser_preview_server.scene.reset()
+            import concurrent.futures as _cf
             try:
-                _viser_preview_server.gui.reset()
-            except RuntimeError:
-                # viser raises RuntimeError when a GuiTabHandle tries to update
-                # its already-removed parent GuiTabGroupHandle during reset()
-                # traversal — the reset still completes successfully.
+                with _cf.ThreadPoolExecutor(max_workers=1) as _ex:
+                    _ex.submit(_viser_preview_server.gui.reset).result(timeout=5)
+            except (RuntimeError, _cf.TimeoutError):
+                # RuntimeError: viser raises this when a GuiTabHandle tries to
+                # update its already-removed parent GuiTabGroupHandle during the
+                # reset() traversal — the reset still completes successfully.
+                # TimeoutError: gui.reset() can block indefinitely on a hung
+                # viser websocket; abandon it after 5 s to unblock training.
                 pass
 
         def _start_viewer(vec_env, stop_event, camera_state=None, poll=False) -> None:
