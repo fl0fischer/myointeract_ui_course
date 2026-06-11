@@ -79,6 +79,10 @@ if gr.NO_RELOAD:
           sigdepnoise/constantnoise type — changes action-term noise config
           fatigue_enabled — changes whether TorchFatigueState is created
           mj_impl     — changes MuJoCo backend
+        Observation space parameters also require a rebuild as they change
+        the observation vector dimension:
+          obs_keys, fatigue_obs_keys, omni_keys — individual obs terms
+          vision enabled/mode — adds camera observations
         """
         targets = config.env.task_config.targets
         num_t = targets.num_targets
@@ -86,6 +90,17 @@ if gr.NO_RELOAD:
             getattr(targets, f"target_{i}").name for i in range(num_t)
         )
         noise = config.env.muscle_config.noise_params
+        obs_keys = tuple(config.env.task_config.obs_keys)
+        fatigue_obs_keys = tuple(config.env.muscle_config.fatigue_obs_keys)
+        omni_keys = tuple(config.env.task_config.omni_keys)
+        try:
+            vision_cfg = config.vision
+            vision_key = (
+                getattr(vision_cfg, "enabled", False),
+                getattr(vision_cfg, "vision_mode", None),
+            )
+        except AttributeError:
+            vision_key = (False, None)
         return (
             config.env.model_path,
             config.env.ctrl_dt,
@@ -96,6 +111,10 @@ if gr.NO_RELOAD:
             config.env.mj_impl,
             num_t,
             shapes,
+            obs_keys,
+            fatigue_obs_keys,
+            omni_keys,
+            vision_key,
         )
 
     # Hardcoded target coordinate origin (matches register_mjlab_myouser_tasks.py line ~542).
@@ -240,6 +259,12 @@ if gr.NO_RELOAD:
             import traceback
             print(f"[render] Could not load checkpoint from {p}: {exc}")
             traceback.print_exc()
+            if isinstance(exc, RuntimeError) and "size mismatch" in str(exc):
+                gr.Warning(
+                    "The selected checkpoint is incompatible with the current observation "
+                    "space settings (observation dimension mismatch). Please match the "
+                    "settings to those used during training, or select a different checkpoint."
+                )
             return None, None
 
     class _StopViewer(BaseException):
@@ -2226,7 +2251,17 @@ def get_ui(project_name, run_state=RunState(), use_legacy_rendering=False):
                 vec_env, asdict(rl_cfg_local), str(checkpoint.parent), device,
                 task_id="myoUserUniversal-v0",
             )
-            runner.load_onnx(checkpoint)
+            try:
+                runner.load_onnx(checkpoint)
+            except RuntimeError as exc:
+                if "size mismatch" in str(exc):
+                    gr.Warning(
+                        "The checkpoint is incompatible with the current observation "
+                        "space settings (observation dimension mismatch). Please match "
+                        "the settings to those used during training, or select a different checkpoint."
+                    )
+                    return _viser_preview_url
+                raise
             policy = runner.get_inference_policy(device=device)
             print(f"[render] Loaded checkpoint: {checkpoint.name} from {_log_dir.name}")
 
