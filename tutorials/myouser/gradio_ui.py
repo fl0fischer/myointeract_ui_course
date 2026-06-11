@@ -2272,97 +2272,107 @@ def get_ui(project_name, run_state=RunState(), use_legacy_rendering=False):
                 gr.Warning("Invalid configuration.")
                 return gr.skip()
 
-            config = load_config_interactive(cfg_overrides)
-            device = "cuda:0" if torch.cuda.is_available() else "cpu"
+            import concurrent.futures as _cf
 
-            new_key = _render_struct_key(config)
-            structural_change = _render_state["struct_key"] != new_key or _render_state["env"] is None
+            def _core():
+                config = load_config_interactive(cfg_overrides)
+                device = "cuda:0" if torch.cuda.is_available() else "cpu"
 
-            # Capture camera before teardown so we can restore it afterwards.
-            camera_state = _capture_camera_state()
-            _stop_current_viewer()
+                new_key = _render_struct_key(config)
+                structural_change = _render_state["struct_key"] != new_key or _render_state["env"] is None
 
-            if structural_change and run_state.is_training:
-                # Cannot create/destroy envs while training holds the CUDA allocator.
-                if _render_state["env"] is None:
+                # Capture camera before teardown so we can restore it afterwards.
+                camera_state = _capture_camera_state()
+                _stop_current_viewer()
+
+                if structural_change and run_state.is_training:
+                    # Cannot create/destroy envs while training holds the CUDA allocator.
+                    if _render_state["env"] is None:
+                        gr.Warning(
+                            "Render environment not ready. "
+                            "Call prepare_for_training() before starting training."
+                        )
+                        return gr.skip()
+                    # Config changed during training: reuse existing env, update geoms only.
                     gr.Warning(
-                        "Render environment not ready. "
-                        "Call prepare_for_training() before starting training."
+                        "Some of the requested changes can only be applied after training. "
+                        "The current rendering may not fully reflect the new configuration."
                     )
-                    return gr.skip()
-                # Config changed during training: reuse existing env, update geoms only.
-                gr.Warning(
-                    "Some of the requested changes can only be applied after training. "
-                    "The current rendering may not fully reflect the new configuration."
-                )
-                structural_change = False
+                    structural_change = False
 
-            if structural_change:
-                # Full restart: rebuild env from new registration.
-                if _render_state["env"] is not None:
+                if structural_change:
+                    # Full restart: rebuild env from new registration.
+                    if _render_state["env"] is not None:
+                        try:
+                            _render_state["env"].close()
+                        except Exception:
+                            pass
+                        _render_state["env"] = None
+                        _render_state["vec_env"] = None
+
+                    register_mjlab_myouser_task(config)
+
+                    env_cfg = load_env_cfg("myoUserUniversal-v0")
+                    rl_cfg = load_rl_cfg('myoUserUniversal-v0')
+                    env_cfg.scene.num_envs = 1
+                    # Place the camera closer to the hand workspace (only used when
+                    # no prior camera state exists, i.e. the very first render).
+                    env_cfg.viewer.distance = 2.5
+                    env_cfg.viewer.elevation = 45.0
+                    env_cfg.viewer.azimuth = 135.0
+                    env = ManagerBasedRlEnv(cfg=env_cfg, device=device)
+                    vec_env = RslRlVecEnvWrapper(env, clip_actions=rl_cfg.clip_actions)
+                    # Set mj_model colors/sizes to the configured values so the viewer
+                    # bakes them correctly.  The spec builds the model with a random DR
+                    # sample; _update_model_geoms overwrites that with config averages.
+                    _update_model_geoms(env, config)
+                    _render_state["env"] = env
+                    _render_state["vec_env"] = vec_env
+                    _render_state["struct_key"] = new_key
+                else:
+                    # Fast path: non-structural change (same model, same targets).
+                    # Update mj_model colors/sizes (what viser bakes at setup() time)
+                    # and event term params (what env.reset() samples for positions).
+                    # Restarting the viewer is enough to pick up color/size changes;
+                    # no env rebuild needed (~1 s vs ~30 s).
+                    _update_model_geoms(_render_state["env"], config)
                     try:
-                        _render_state["env"].close()
+                        _render_state["env"].reset()
                     except Exception:
                         pass
-                    _render_state["env"] = None
-                    _render_state["vec_env"] = None
 
-                register_mjlab_myouser_task(config)
+                # Load checkpoint policy directly from the dropdown selections,
+                # bypassing config so the values are always current at call time.
+                # args[6] = select_checkpoint_run, args[7] = select_checkpoint_file
+                # (RLParameters fields 6 and 7 within run_inputs).
+                checkpoint_run = args[6]
+                checkpoint_file = args[7]
+                policy, ckpt_manager = _build_policy_and_ckpt_manager(
+                    checkpoint_run, checkpoint_file, device
+                )
+                _render_state["policy"] = policy
+                _render_state["checkpoint_manager"] = ckpt_manager
 
-                env_cfg = load_env_cfg("myoUserUniversal-v0")
-                rl_cfg = load_rl_cfg('myoUserUniversal-v0')
-                env_cfg.scene.num_envs = 1
-                # Place the camera closer to the hand workspace (only used when
-                # no prior camera state exists, i.e. the very first render).
-                env_cfg.viewer.distance = 2.5
-                env_cfg.viewer.elevation = 45.0
-                env_cfg.viewer.azimuth = 135.0
-                env = ManagerBasedRlEnv(cfg=env_cfg, device=device)
-                vec_env = RslRlVecEnvWrapper(env, clip_actions=rl_cfg.clip_actions)
-                # Set mj_model colors/sizes to the configured values so the viewer
-                # bakes them correctly.  The spec builds the model with a random DR
-                # sample; _update_model_geoms overwrites that with config averages.
-                _update_model_geoms(env, config)
-                _render_state["env"] = env
-                _render_state["vec_env"] = vec_env
-                _render_state["struct_key"] = new_key
-            else:
-                # Fast path: non-structural change (same model, same targets).
-                # Update mj_model colors/sizes (what viser bakes at setup() time)
-                # and event term params (what env.reset() samples for positions).
-                # Restarting the viewer is enough to pick up color/size changes;
-                # no env rebuild needed (~1 s vs ~30 s).
-                _update_model_geoms(_render_state["env"], config)
-                try:
-                    _render_state["env"].reset()
-                except Exception:
-                    pass
+                stop_event = threading.Event()
+                _start_viewer(_render_state["vec_env"], stop_event, camera_state=camera_state)
 
-            # Load checkpoint policy directly from the dropdown selections,
-            # bypassing config so the values are always current at call time.
-            # args[6] = select_checkpoint_run, args[7] = select_checkpoint_file
-            # (RLParameters fields 6 and 7 within run_inputs).
-            checkpoint_run = args[6]
-            checkpoint_file = args[7]
-            policy, ckpt_manager = _build_policy_and_ckpt_manager(
-                checkpoint_run, checkpoint_file, device
-            )
-            _render_state["policy"] = policy
-            _render_state["checkpoint_manager"] = ckpt_manager
+                iframe_html = (
+                    f'<iframe src="{_viser_preview_url}" '
+                    f'width="100%" height="520px" frameborder="0" '
+                    f'allow="cross-origin-isolated"></iframe>'
+                )
+                return (
+                    gr.update(value=next_seed),
+                    gr.update(visible=True),
+                    gr.update(value=iframe_html),
+                )
 
-            stop_event = threading.Event()
-            _start_viewer(_render_state["vec_env"], stop_event, camera_state=camera_state)
-
-            iframe_html = (
-                f'<iframe src="{_viser_preview_url}" '
-                f'width="100%" height="520px" frameborder="0" '
-                f'allow="cross-origin-isolated"></iframe>'
-            )
-            return (
-                gr.update(value=next_seed),
-                gr.update(visible=True),
-                gr.update(value=iframe_html),
-            )
+            try:
+                with _cf.ThreadPoolExecutor(max_workers=1) as _ex:
+                    return _ex.submit(_core).result(timeout=90)
+            except _cf.TimeoutError:
+                gr.Warning("Preview update timed out after 90 s — please try again.")
+                return gr.skip()
 
         def update_dynamic_elements(num):
             """Show/hide dynamic rows based on the number input"""
