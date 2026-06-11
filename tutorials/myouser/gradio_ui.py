@@ -2107,7 +2107,13 @@ def get_ui(project_name, run_state=RunState(), use_legacy_rendering=False):
             # Reset both 3D scene geometry and GUI control panel so no old
             # elements bleed into the new viewer instance.
             _viser_preview_server.scene.reset()
-            _viser_preview_server.gui.reset()
+            try:
+                _viser_preview_server.gui.reset()
+            except RuntimeError:
+                # viser raises RuntimeError when a GuiTabHandle tries to update
+                # its already-removed parent GuiTabGroupHandle during reset()
+                # traversal — the reset still completes successfully.
+                pass
 
         def _start_viewer(vec_env, stop_event, camera_state=None, poll=False) -> None:
             """Create and start a viewer thread.
