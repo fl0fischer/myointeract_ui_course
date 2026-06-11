@@ -262,18 +262,21 @@ try:
         make_fullbody_checkpoint_bridged_policy,
     )
     from myosuite.integrations.musclemimic.trajectory_io import load_motion_clip
-    from myosuite.utils.onnx_checkpoint import (
-        _FATIGUE_STATE_KEY,
-        bundle_onnx_with_checkpoint,
-        extract_checkpoint_from_onnx,
-        get_env_fatigue_state,
-        get_wandb_onnx_checkpoint_path,
-        set_env_fatigue_state,
-    )
 
     _TRAINING_DEPS_AVAILABLE = True
 except ImportError:
     _TRAINING_DEPS_AVAILABLE = False
+
+# onnx_checkpoint is always available (it lives in this package and has no
+# heavy dependencies), so import it unconditionally outside the guard above.
+from myosuite.utils.onnx_checkpoint import (
+    _FATIGUE_STATE_KEY,
+    bundle_onnx_with_checkpoint,
+    extract_checkpoint_from_onnx,
+    get_env_fatigue_state,
+    get_wandb_onnx_checkpoint_path,
+    set_env_fatigue_state,
+)
 
 
 class _ActorExportWrapper(torch.nn.Module):
