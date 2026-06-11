@@ -1516,12 +1516,13 @@ class RLParameters:
 def update_dwell_duration(dwell_duration, ctrl_dt):
     return gr.update(minimum=max(ctrl_dt, 0))
 
+CONFIG_PATH = Path(__file__).resolve().parent / "gradio_configs"
 
 class ConfigSaver:
     def check_folder(self):
-        if not os.path.exists("gradio_configs"):
-            os.makedirs("gradio_configs")
-        files = os.listdir("gradio_configs")
+        if not os.path.exists(CONFIG_PATH):
+            os.makedirs(CONFIG_PATH)
+        files = os.listdir(CONFIG_PATH)
         json_files = [file for file in files if file.endswith(".json")]
         file_names = [file.split(".")[0] for file in json_files]
         return file_names
@@ -1574,7 +1575,7 @@ class ConfigSaver:
 
     def add_config(self, config_name, data):
         labelled_dict = self.to_labelled_dict(data)
-        with open(f"gradio_configs/{config_name}.json", "w") as f:
+        with open(CONFIG_PATH / f"{config_name}.json", "w") as f:
             json.dump(labelled_dict, f, indent=4)
 
     def config_save_clicked(self, config_name_input, *args):
@@ -1590,7 +1591,7 @@ class ConfigSaver:
         return self.my_configs
 
     def load_config(self, config_name):
-        with open(f"gradio_configs/{config_name}.json", "r") as f:
+        with open(CONFIG_PATH / f"{config_name}.json", "r") as f:
             # data = json.load(f)
             labelled_data = json.load(f)
         data = self.from_labelled_dict(labelled_data)
