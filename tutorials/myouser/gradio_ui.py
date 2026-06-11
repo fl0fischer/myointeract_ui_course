@@ -287,13 +287,17 @@ if gr.NO_RELOAD:
 
     class _ZeroActionInner:
         """Stateless zero-action policy (no stop logic — that lives in _StoppablePolicy)."""
-        def __init__(self, num_actions: int, device: str) -> None:
+        def __init__(self, num_actions: int, device: str, action_mode: str = "sigmoid") -> None:
             self._n = num_actions
             self._dev = device
+            # In sigmoid mode process_actions applies sigma(5*(a-0.5)), so raw=0
+            # maps to ~7.6% excitation, not zero.  Use a strongly negative value
+            # so that sigma(5*(-3-0.5)) < 3e-8 — effectively zero excitation.
+            self._fill = -3.0 if action_mode == "sigmoid" else 0.0
 
         def __call__(self, obs):
             n = next(iter(obs.values())).shape[0] if hasattr(obs, "values") else obs.shape[0]
-            return torch.zeros(n, self._n, device=self._dev)
+            return torch.full((n, self._n), self._fill, device=self._dev)
 
         def reset(self) -> None:
             pass
@@ -2153,7 +2157,14 @@ def get_ui(project_name, run_state=RunState(), use_legacy_rendering=False):
             "Training Metrics" panel that reads from the TFEvents file every 30s.
             """
             device = "cuda:0" if torch.cuda.is_available() else "cpu"
-            inner = _render_state["policy"] or _ZeroActionInner(vec_env.num_actions, device)
+            _action_mode = "sigmoid"
+            try:
+                _muscles = vec_env.unwrapped.action_manager.get_term("muscles")
+                if hasattr(_muscles, "cfg") and hasattr(_muscles.cfg, "action_mode"):
+                    _action_mode = _muscles.cfg.action_mode
+            except Exception:
+                pass
+            inner = _render_state["policy"] or _ZeroActionInner(vec_env.num_actions, device, _action_mode)
             policy = _StoppablePolicy(inner, stop_event)
             viewer_cls = PollingViserViewer if poll else CameraRestoringViserViewer
             extra_kwargs = {"log_dir": log_dir} if poll and log_dir is not None else {}
