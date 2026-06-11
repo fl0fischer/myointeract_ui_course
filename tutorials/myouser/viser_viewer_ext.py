@@ -25,8 +25,36 @@ import threading
 import time
 from typing import Any
 
+import viser
 from mjlab.viewer.base import ViewerAction
 from mjlab.viewer.viser.viewer import ViserPlayViewer
+
+_TRAINING_METRIC_PREFIXES = ("Episode_Metrics/", "Train/mean_reward", "Train/mean_episode_length")
+_TRAINING_METRICS_UPDATE_INTERVAL_S = 5
+
+
+def _read_tfevents_history(log_dir: str) -> dict[str, tuple]:
+    """Return {tag: (steps, values)} for display-relevant scalars in log_dir.
+
+    Uses size_guidance=0 (unlimited) so the full training history is returned.
+    Each ScalarEvent has .step (iteration) and .value (float).
+    Tags with fewer than 2 events are omitted (uplot needs at least 2 points).
+    """
+    import numpy as np
+    from tensorboard.backend.event_processing.event_accumulator import EventAccumulator
+
+    ea = EventAccumulator(log_dir, size_guidance={"scalars": 0})
+    ea.Reload()
+    result = {}
+    for tag in ea.Tags().get("scalars", []):
+        if any(tag.startswith(p) for p in _TRAINING_METRIC_PREFIXES):
+            events = ea.Scalars(tag)
+            if len(events) >= 2:
+                result[tag] = (
+                    np.array([e.step for e in events], dtype=np.float64),
+                    np.array([e.value for e in events], dtype=np.float64),
+                )
+    return result
 
 
 class CameraRestoringViserViewer(ViserPlayViewer):
@@ -94,11 +122,30 @@ class PollingViserViewer(CameraRestoringViserViewer):
     clearing happens.
     """
 
-    def __init__(self, *args: Any, **kwargs: Any) -> None:
+    def __init__(self, *args: Any, log_dir: str | None = None, **kwargs: Any) -> None:
+        self._log_dir = log_dir
+        self._training_metrics_md: Any = None
+        self._training_metrics_tab_id: str | None = None
+        self._training_metric_plots: dict[str, Any] = {}
         super().__init__(*args, **kwargs)
 
     def setup(self) -> None:
-        super().setup()
+        # Intercept the tab group created by ViserPlayViewer.setup() so we can
+        # add "Training Metrics" as a sibling of "Checkpoints", not a new group.
+        _orig = self._server.gui.add_tab_group
+        _captured: list = []
+
+        def _intercept(*args: Any, **kwargs: Any) -> Any:
+            handle = _orig(*args, **kwargs)
+            _captured.append(handle)
+            return handle
+
+        self._server.gui.add_tab_group = _intercept
+        try:
+            super().setup()
+        finally:
+            self._server.gui.add_tab_group = _orig
+
         if self._ckpt_mgr is not None:
             # Store the Checkpoints tab container ID so _add_notification() can
             # inject new elements into the same tab dynamically from the poll thread.
@@ -112,6 +159,67 @@ class PollingViserViewer(CameraRestoringViserViewer):
                     name = self._ckpt_dropdown.value.split("  (")[0]
                     self._remove_notification_for(name)
             threading.Thread(target=self._poll_loop, daemon=True).start()
+
+        if self._log_dir is not None and _captured:
+            with _captured[0].add_tab("Training Metrics", icon=viser.Icon.CHART_BAR):
+                self._training_metrics_tab_id = self._server.gui._get_container_uuid()
+                self._training_metrics_md = self._server.gui.add_markdown(
+                    "<small><em>Awaiting first metrics update (≤5s)…</em></small>"
+                )
+            threading.Thread(target=self._training_metrics_loop, daemon=True).start()
+
+    # ── training metrics panel ────────────────────────────────────────────────
+
+    def _training_metrics_loop(self) -> None:
+        """Read the TFEvents log every 30 s and update per-metric uplot history panels."""
+        while True:
+            time.sleep(_TRAINING_METRICS_UPDATE_INTERVAL_S)
+            if self._log_dir is None or self._training_metrics_tab_id is None:
+                continue
+            try:
+                history = _read_tfevents_history(self._log_dir)
+            except Exception:
+                continue
+            if not history:
+                continue
+
+            # Remove placeholder markdown on first data arrival.
+            if self._training_metrics_md is not None:
+                try:
+                    self._training_metrics_md.remove()
+                except Exception:
+                    pass
+                self._training_metrics_md = None
+
+            for tag, (steps, values) in sorted(history.items()):
+                label = tag.split("/", 1)[-1]
+                if tag not in self._training_metric_plots:
+                    try:
+                        prev_id = self._server.gui._get_container_uuid()
+                        self._server.gui._set_container_uuid(self._training_metrics_tab_id)
+                        handle = self._server.gui.add_uplot(
+                            data=(steps, values),
+                            series=(
+                                viser.uplot.Series(label="Iteration"),
+                                viser.uplot.Series(label=label, stroke="#1f77b4", width=2),
+                            ),
+                            scales={
+                                "x": viser.uplot.Scale(time=False, auto=True),
+                                "y": viser.uplot.Scale(auto=True),
+                            },
+                            legend=viser.uplot.Legend(show=False),
+                            title=label,
+                            aspect=2.0,
+                        )
+                        self._server.gui._set_container_uuid(prev_id)
+                        self._training_metric_plots[tag] = handle
+                    except Exception:
+                        pass
+                else:
+                    try:
+                        self._training_metric_plots[tag].data = (steps, values)
+                    except Exception:
+                        pass
 
     # ── background polling ────────────────────────────────────────────────────
 
