@@ -30,7 +30,7 @@ from mjlab.viewer.base import ViewerAction
 from mjlab.viewer.viser.viewer import ViserPlayViewer
 
 _TRAINING_METRIC_PREFIXES = ("Episode_Metrics/", "Train/mean_reward", "Train/mean_episode_length")
-_TRAINING_METRICS_UPDATE_INTERVAL_S = 30
+_TRAINING_METRICS_UPDATE_INTERVAL_S = 5
 
 
 def _read_tfevents_history(log_dir: str) -> dict[str, tuple]:
@@ -164,7 +164,7 @@ class PollingViserViewer(CameraRestoringViserViewer):
             with _captured[0].add_tab("Training Metrics", icon=viser.Icon.CHART_BAR):
                 self._training_metrics_tab_id = self._server.gui._get_container_uuid()
                 self._training_metrics_md = self._server.gui.add_markdown(
-                    "<small><em>Awaiting first metrics update (≤30s)…</em></small>"
+                    "<small><em>Awaiting first metrics update (≤5s)…</em></small>"
                 )
             threading.Thread(target=self._training_metrics_loop, daemon=True).start()
 
