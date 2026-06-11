@@ -130,7 +130,22 @@ class PollingViserViewer(CameraRestoringViserViewer):
         super().__init__(*args, **kwargs)
 
     def setup(self) -> None:
-        super().setup()
+        # Intercept the tab group created by ViserPlayViewer.setup() so we can
+        # add "Training Metrics" as a sibling of "Checkpoints", not a new group.
+        _orig = self._server.gui.add_tab_group
+        _captured: list = []
+
+        def _intercept(*args: Any, **kwargs: Any) -> Any:
+            handle = _orig(*args, **kwargs)
+            _captured.append(handle)
+            return handle
+
+        self._server.gui.add_tab_group = _intercept
+        try:
+            super().setup()
+        finally:
+            self._server.gui.add_tab_group = _orig
+
         if self._ckpt_mgr is not None:
             # Store the Checkpoints tab container ID so _add_notification() can
             # inject new elements into the same tab dynamically from the poll thread.
@@ -145,11 +160,8 @@ class PollingViserViewer(CameraRestoringViserViewer):
                     self._remove_notification_for(name)
             threading.Thread(target=self._poll_loop, daemon=True).start()
 
-        # Standalone "Training Metrics" tab group — only shown in render_training_result mode.
-        if self._log_dir is not None:
-            with self._server.gui.add_tab_group().add_tab(
-                "Training Metrics", icon=viser.Icon.CHART_BAR
-            ):
+        if self._log_dir is not None and _captured:
+            with _captured[0].add_tab("Training Metrics", icon=viser.Icon.CHART_BAR):
                 self._training_metrics_tab_id = self._server.gui._get_container_uuid()
                 self._training_metrics_md = self._server.gui.add_markdown(
                     "_Awaiting first metrics update (≤30s)…_"
@@ -188,11 +200,16 @@ class PollingViserViewer(CameraRestoringViserViewer):
                         handle = self._server.gui.add_uplot(
                             data=(steps, values),
                             series=(
-                                viser.uplot.Series(label=""),
-                                viser.uplot.Series(label=label),
+                                viser.uplot.Series(label="Iteration"),
+                                viser.uplot.Series(label=label, stroke="#1f77b4", width=2),
                             ),
+                            scales={
+                                "x": viser.uplot.Scale(time=False, auto=True),
+                                "y": viser.uplot.Scale(auto=True),
+                            },
+                            legend=viser.uplot.Legend(show=False),
                             title=label,
-                            aspect=0.5,
+                            aspect=2.0,
                         )
                         self._server.gui._set_container_uuid(prev_id)
                         self._training_metric_plots[tag] = handle
