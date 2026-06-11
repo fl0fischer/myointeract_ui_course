@@ -6,7 +6,6 @@ dist/
 build/
 .eggs/
 logs/
-tracked_checkpoints/
 wandb/
 *.ipynb_checkpoints/
 .gradio/
