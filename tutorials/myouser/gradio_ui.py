@@ -329,22 +329,20 @@ def is_number(s: str):
 def _run_checkpoint_dir(checkpoint_run: str) -> str | None:
     """Return the directory containing .onnx files for a run.
 
-    Accepted layout:
-    - ``CHECKPOINT_PATH/<run>/``
-    Returns None when this directory does not exist.
+    Searches CHECKPOINT_PATH first, then LOG_DIR (for own training runs).
+    Returns None when neither contains a matching directory.
     """
-    base = os.path.join(CHECKPOINT_PATH, checkpoint_run)
-    for sub in ("",):
-        candidate = os.path.join(base, sub)
+    for base_dir in (CHECKPOINT_PATH, LOG_DIR):
+        candidate = os.path.join(base_dir, checkpoint_run)
         if os.path.isdir(candidate):
             return candidate
     return None
 
 
-def get_available_checkpoint_numbers(checkpoint_run):
+def get_available_checkpoint_numbers(checkpoint_run, show_training_ckpts):
     if checkpoint_run == "None":
         return ["None"]
-    tracked_checkpoints = checkpoints_diff_folder()
+    tracked_checkpoints = checkpoints_diff_folder(show_training_ckpts=show_training_ckpts)
     if checkpoint_run not in tracked_checkpoints:
         return ["None"]
     checkpoint_path = _run_checkpoint_dir(checkpoint_run)
@@ -362,7 +360,7 @@ def get_available_checkpoint_numbers(checkpoint_run):
 def checkpoint_path_from_run_filename(checkpoint_run, checkpoint_filename):
     if checkpoint_run == "None" or checkpoint_filename == "None":
         return "None"
-    tracked_checkpoints = checkpoints_diff_folder()
+    tracked_checkpoints = checkpoints_diff_folder(show_training_ckpts=True)
     if checkpoint_run not in tracked_checkpoints:
         return "None"
     ckpt_dir = _run_checkpoint_dir(checkpoint_run)
@@ -376,8 +374,8 @@ def update_checkpoint_dirs(show_training_ckpts):
     return gr.update(choices=choices, value=choices[0])
 
 
-def update_checkpoint_numbers(checkpoint_run):
-    choices = get_available_checkpoint_numbers(checkpoint_run)
+def update_checkpoint_numbers(checkpoint_run, show_training_ckpts):
+    choices = get_available_checkpoint_numbers(checkpoint_run, show_training_ckpts)
     return gr.update(choices=choices, value=choices[0])
 
 
@@ -1363,7 +1361,7 @@ class RLParameters:
                 value="None",
                 allow_custom_value=True,
             )
-            choices = get_available_checkpoint_numbers(select_checkpoint_run.value)
+            choices = get_available_checkpoint_numbers(select_checkpoint_run.value, show_training_ckpts.value)
             select_checkpoint_file = gr.Dropdown(
                 label="Select Checkpoint File",
                 choices=choices,
@@ -1373,7 +1371,7 @@ class RLParameters:
             )
             select_checkpoint_run.change(
                 update_checkpoint_numbers,
-                inputs=select_checkpoint_run,
+                inputs=[select_checkpoint_run, show_training_ckpts],
                 outputs=select_checkpoint_file,
             )
         show_training_ckpts.change(
@@ -1433,12 +1431,12 @@ class RLParameters:
         sanity_check &= sanity_check_choices(
             select_checkpoint_run,
             "Select Experiment from Which to Load Checkpoints",
-            get_available_checkpoints(),
+            get_available_checkpoints(show_training_ckpts),
         )
         sanity_check &= sanity_check_choices(
             select_checkpoint_file,
             "Select Checkpoint File",
-            get_available_checkpoint_numbers(select_checkpoint_run),
+            get_available_checkpoint_numbers(select_checkpoint_run, show_training_ckpts),
         )
         sanity_check &= sanity_check_bool(
             show_training_ckpts, "Show Checkpoints from Own Training Runs"
