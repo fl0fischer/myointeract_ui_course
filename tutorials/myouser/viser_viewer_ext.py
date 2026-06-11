@@ -25,8 +25,27 @@ import threading
 import time
 from typing import Any
 
+import viser
 from mjlab.viewer.base import ViewerAction
 from mjlab.viewer.viser.viewer import ViserPlayViewer
+
+_TRAINING_METRIC_PREFIXES = ("Episode_Metrics/", "Train/mean_reward", "Train/mean_episode_length")
+_TRAINING_METRICS_UPDATE_INTERVAL_S = 30
+
+
+def _read_latest_tfevents(log_dir: str) -> dict[str, float]:
+    """Return {tag: latest_value} for display-relevant scalars from the TFEvents file in log_dir."""
+    from tensorboard.backend.event_processing.event_accumulator import EventAccumulator
+
+    ea = EventAccumulator(log_dir, size_guidance={"scalars": 1})
+    ea.Reload()
+    result = {}
+    for tag in ea.Tags().get("scalars", []):
+        if any(tag.startswith(p) for p in _TRAINING_METRIC_PREFIXES):
+            events = ea.Scalars(tag)
+            if events:
+                result[tag] = events[-1].value
+    return result
 
 
 class CameraRestoringViserViewer(ViserPlayViewer):
@@ -94,7 +113,9 @@ class PollingViserViewer(CameraRestoringViserViewer):
     clearing happens.
     """
 
-    def __init__(self, *args: Any, **kwargs: Any) -> None:
+    def __init__(self, *args: Any, log_dir: str | None = None, **kwargs: Any) -> None:
+        self._log_dir = log_dir
+        self._training_metrics_md: Any = None
         super().__init__(*args, **kwargs)
 
     def setup(self) -> None:
@@ -112,6 +133,58 @@ class PollingViserViewer(CameraRestoringViserViewer):
                     name = self._ckpt_dropdown.value.split("  (")[0]
                     self._remove_notification_for(name)
             threading.Thread(target=self._poll_loop, daemon=True).start()
+
+        # Standalone "Training Metrics" tab group — only shown in render_training_result mode.
+        if self._log_dir is not None:
+            with self._server.gui.add_tab_group().add_tab(
+                "Training Metrics", icon=viser.Icon.CHART_BAR
+            ):
+                self._training_metrics_md = self._server.gui.add_markdown(
+                    "_Awaiting first metrics update (≤30s)…_"
+                )
+            threading.Thread(target=self._training_metrics_loop, daemon=True).start()
+
+    # ── training metrics panel ────────────────────────────────────────────────
+
+    def _training_metrics_loop(self) -> None:
+        """Read the TFEvents log every 30 s and refresh the Training Metrics markdown panel."""
+        while True:
+            time.sleep(_TRAINING_METRICS_UPDATE_INTERVAL_S)
+            if self._training_metrics_md is None or self._log_dir is None:
+                continue
+            try:
+                metrics = _read_latest_tfevents(self._log_dir)
+            except Exception:
+                continue
+            if not metrics:
+                continue
+            ep_rows = [
+                (k.removeprefix("Episode_Metrics/"), v)
+                for k, v in sorted(metrics.items())
+                if k.startswith("Episode_Metrics/")
+            ]
+            train_rows = [
+                (k.removeprefix("Train/"), v)
+                for k, v in sorted(metrics.items())
+                if k.startswith("Train/")
+            ]
+            parts = []
+            if ep_rows:
+                parts.append(
+                    "**Episode Metrics**\n\n| Metric | Value |\n|---|---|\n"
+                    + "\n".join(f"| {k} | {v:.4f} |" for k, v in ep_rows)
+                )
+            if train_rows:
+                parts.append(
+                    "**Training**\n\n| Metric | Value |\n|---|---|\n"
+                    + "\n".join(f"| {k} | {v:.4f} |" for k, v in train_rows)
+                )
+            try:
+                self._training_metrics_md.content = (
+                    "\n\n".join(parts) if parts else "_No metrics found._"
+                )
+            except Exception:
+                pass
 
     # ── background polling ────────────────────────────────────────────────────
 

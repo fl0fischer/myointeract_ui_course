@@ -2140,7 +2140,7 @@ def get_ui(project_name, run_state=RunState(), use_legacy_rendering=False):
                 # viser websocket; abandon it after 5 s to unblock training.
                 pass
 
-        def _start_viewer(vec_env, stop_event, camera_state=None, poll=False) -> None:
+        def _start_viewer(vec_env, stop_event, camera_state=None, poll=False, log_dir=None) -> None:
             """Create and start a viewer thread.
 
             camera_state: dict with 'position' and 'look_at' arrays captured
@@ -2149,17 +2149,21 @@ def get_ui(project_name, run_state=RunState(), use_legacy_rendering=False):
             render, otherwise falls back to zero actions.
             poll: use PollingViserViewer (background checkpoint polling + modal
             notifications) instead of CameraRestoringViserViewer.
+            log_dir: if provided (poll=True path), PollingViserViewer adds a
+            "Training Metrics" panel that reads from the TFEvents file every 30s.
             """
             device = "cuda:0" if torch.cuda.is_available() else "cpu"
             inner = _render_state["policy"] or _ZeroActionInner(vec_env.num_actions, device)
             policy = _StoppablePolicy(inner, stop_event)
             viewer_cls = PollingViserViewer if poll else CameraRestoringViserViewer
+            extra_kwargs = {"log_dir": log_dir} if poll and log_dir is not None else {}
             viewer = viewer_cls(
                 vec_env,
                 policy,
                 viser_server=_viser_preview_server,
                 post_setup_camera=camera_state,
                 checkpoint_manager=_render_state.get("checkpoint_manager"),
+                **extra_kwargs,
             )
             thread = threading.Thread(target=_run_viewer, args=(viewer, stop_event), daemon=True)
             _render_state["viewer"] = viewer
@@ -2291,7 +2295,7 @@ def get_ui(project_name, run_state=RunState(), use_legacy_rendering=False):
             _render_state["checkpoint_manager"] = ckpt_manager
 
             stop_event = threading.Event()
-            _start_viewer(vec_env, stop_event, poll=True)
+            _start_viewer(vec_env, stop_event, poll=True, log_dir=str(_log_dir))
 
             return _viser_preview_url
 
