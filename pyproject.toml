@@ -45,4 +45,4 @@ include = ["myosuite*", "tutorials*"]
 
 [tool.setuptools.package-data]
 "myosuite" = ["**/*.xml", "**/*.stl", "**/*.obj", "**/*.png"]
-"tutorials.myouser" = ["gradio_configs/*.json"]
+"tutorials.myouser" = ["gradio_configs/*.json", "tracked_checkpoints/**/*.onnx"]
