@@ -164,7 +164,7 @@ class PollingViserViewer(CameraRestoringViserViewer):
             with _captured[0].add_tab("Training Metrics", icon=viser.Icon.CHART_BAR):
                 self._training_metrics_tab_id = self._server.gui._get_container_uuid()
                 self._training_metrics_md = self._server.gui.add_markdown(
-                    "_Awaiting first metrics update (≤30s)…_"
+                    "<small><em>Awaiting first metrics update (≤30s)…</em></small>"
                 )
             threading.Thread(target=self._training_metrics_loop, daemon=True).start()
 
