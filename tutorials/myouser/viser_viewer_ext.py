@@ -33,18 +33,27 @@ _TRAINING_METRIC_PREFIXES = ("Episode_Metrics/", "Train/mean_reward", "Train/mea
 _TRAINING_METRICS_UPDATE_INTERVAL_S = 30
 
 
-def _read_latest_tfevents(log_dir: str) -> dict[str, float]:
-    """Return {tag: latest_value} for display-relevant scalars from the TFEvents file in log_dir."""
+def _read_tfevents_history(log_dir: str) -> dict[str, tuple]:
+    """Return {tag: (steps, values)} for display-relevant scalars in log_dir.
+
+    Uses size_guidance=0 (unlimited) so the full training history is returned.
+    Each ScalarEvent has .step (iteration) and .value (float).
+    Tags with fewer than 2 events are omitted (uplot needs at least 2 points).
+    """
+    import numpy as np
     from tensorboard.backend.event_processing.event_accumulator import EventAccumulator
 
-    ea = EventAccumulator(log_dir, size_guidance={"scalars": 1})
+    ea = EventAccumulator(log_dir, size_guidance={"scalars": 0})
     ea.Reload()
     result = {}
     for tag in ea.Tags().get("scalars", []):
         if any(tag.startswith(p) for p in _TRAINING_METRIC_PREFIXES):
             events = ea.Scalars(tag)
-            if events:
-                result[tag] = events[-1].value
+            if len(events) >= 2:
+                result[tag] = (
+                    np.array([e.step for e in events], dtype=np.float64),
+                    np.array([e.value for e in events], dtype=np.float64),
+                )
     return result
 
 
@@ -116,6 +125,8 @@ class PollingViserViewer(CameraRestoringViserViewer):
     def __init__(self, *args: Any, log_dir: str | None = None, **kwargs: Any) -> None:
         self._log_dir = log_dir
         self._training_metrics_md: Any = None
+        self._training_metrics_tab_id: str | None = None
+        self._training_metric_plots: dict[str, Any] = {}
         super().__init__(*args, **kwargs)
 
     def setup(self) -> None:
@@ -139,6 +150,7 @@ class PollingViserViewer(CameraRestoringViserViewer):
             with self._server.gui.add_tab_group().add_tab(
                 "Training Metrics", icon=viser.Icon.CHART_BAR
             ):
+                self._training_metrics_tab_id = self._server.gui._get_container_uuid()
                 self._training_metrics_md = self._server.gui.add_markdown(
                     "_Awaiting first metrics update (≤30s)…_"
                 )
@@ -147,44 +159,50 @@ class PollingViserViewer(CameraRestoringViserViewer):
     # ── training metrics panel ────────────────────────────────────────────────
 
     def _training_metrics_loop(self) -> None:
-        """Read the TFEvents log every 30 s and refresh the Training Metrics markdown panel."""
+        """Read the TFEvents log every 30 s and update per-metric uplot history panels."""
         while True:
             time.sleep(_TRAINING_METRICS_UPDATE_INTERVAL_S)
-            if self._training_metrics_md is None or self._log_dir is None:
+            if self._log_dir is None or self._training_metrics_tab_id is None:
                 continue
             try:
-                metrics = _read_latest_tfevents(self._log_dir)
+                history = _read_tfevents_history(self._log_dir)
             except Exception:
                 continue
-            if not metrics:
+            if not history:
                 continue
-            ep_rows = [
-                (k.removeprefix("Episode_Metrics/"), v)
-                for k, v in sorted(metrics.items())
-                if k.startswith("Episode_Metrics/")
-            ]
-            train_rows = [
-                (k.removeprefix("Train/"), v)
-                for k, v in sorted(metrics.items())
-                if k.startswith("Train/")
-            ]
-            parts = []
-            if ep_rows:
-                parts.append(
-                    "**Episode Metrics**\n\n| Metric | Value |\n|---|---|\n"
-                    + "\n".join(f"| {k} | {v:.4f} |" for k, v in ep_rows)
-                )
-            if train_rows:
-                parts.append(
-                    "**Training**\n\n| Metric | Value |\n|---|---|\n"
-                    + "\n".join(f"| {k} | {v:.4f} |" for k, v in train_rows)
-                )
-            try:
-                self._training_metrics_md.content = (
-                    "\n\n".join(parts) if parts else "_No metrics found._"
-                )
-            except Exception:
-                pass
+
+            # Remove placeholder markdown on first data arrival.
+            if self._training_metrics_md is not None:
+                try:
+                    self._training_metrics_md.remove()
+                except Exception:
+                    pass
+                self._training_metrics_md = None
+
+            for tag, (steps, values) in sorted(history.items()):
+                label = tag.split("/", 1)[-1]
+                if tag not in self._training_metric_plots:
+                    try:
+                        prev_id = self._server.gui._get_container_uuid()
+                        self._server.gui._set_container_uuid(self._training_metrics_tab_id)
+                        handle = self._server.gui.add_uplot(
+                            data=(steps, values),
+                            series=(
+                                viser.uplot.Series(label=""),
+                                viser.uplot.Series(label=label),
+                            ),
+                            title=label,
+                            aspect=0.5,
+                        )
+                        self._server.gui._set_container_uuid(prev_id)
+                        self._training_metric_plots[tag] = handle
+                    except Exception:
+                        pass
+                else:
+                    try:
+                        self._training_metric_plots[tag].data = (steps, values)
+                    except Exception:
+                        pass
 
     # ── background polling ────────────────────────────────────────────────────
 
