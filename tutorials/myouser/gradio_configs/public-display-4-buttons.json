@@ -1,7 +1,7 @@
 {
     "rl": {
         "Number of Total Training Steps": 16000000,
-        "Checkpoint Interval (in Number of Training Iterations)": 30,
+        "Checkpoint Interval (in Number of Training Iterations)": 15,
         "Number of Parallel Environments": 4096,
         "Unroll Length": 10,
         "Number of Minibatches": 8,
