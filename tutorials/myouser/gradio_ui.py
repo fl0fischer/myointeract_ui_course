@@ -2453,11 +2453,11 @@ def get_ui(project_name, run_state=RunState(), use_legacy_rendering=False):
             )
 
             target_value = (
-                15_000_000
+                5_000_000
                 + (bm_model in ("MoBL_Arms_Hand", "MyoArm")) * 3_000_000   #number to be validated
                 + (bm_model in ("MyoArm_nohand", "MyoArm")) * 10_000_000   #number to be validated
                 + (fatigue_enabled) * 20_000_000  #number to be validated
-                + max((num_elements - 3), 0) * 1_000_000
+                + max((num_elements - 1), 0) * 3_000_000
                 + int(total_dwell_duration // 0.3) * 1_000_000
             )
             return gr.update(value=target_value)
